@@ -1,14 +1,17 @@
-import express from "express";
+const express = require("express");
 const { createTodos } = require("./types");
-const { todo } = require("./mongoDB");
+const { Todoo } = require("./mongoDB");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-
+app.use(cors({
+    // origin: "http://localhost:5173"
+}));
 
 app.post("/todo", async function(req, res){
     const createPayload = req.body;
-    const parsedPayload = createTodos.safeParese(createPayload);
+    const parsedPayload = createTodos.safeParse(createPayload);
 
     if(!parsedPayload.success){
         res.status(411).json({
@@ -16,19 +19,18 @@ app.post("/todo", async function(req, res){
         })
         return;
     }
-    await todo.create({
-        title,
-        description,
+    await Todoo.create({
+        title: createPayload.title,
+        description: createPayload.description,
         completed: false,
     })
     res.json({
         msg: "Todo created",
-    })
-    
+    })    
 })
 
 app.get("/todos",async function(req, res){
-    const todos = await todo.find({});
+    const todos = await Todoo.find({});
     res.json({
         todos
     })
@@ -43,7 +45,7 @@ app.put("/completed", async function(req, res){
         })
         return;
     }
-    await todo.updateTodo({
+    await Todoo.updateTodo({
         _id: req.body.id,
     },{
         completed: true,
@@ -54,7 +56,6 @@ app.put("/completed", async function(req, res){
     //get the id and change the completed field to true
 
 })
-
 
 
 
